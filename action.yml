@@ -1,0 +1,54 @@
+name: install nodejs and pnpm
+description: 'Install nodejs and pnpm environment'
+
+branding:
+  icon: 'check-circle'
+  color: 'green'
+
+inputs:
+  pnpm-version:
+    required: false
+    type: string
+    default: 8
+  node-version:
+    required: false
+    type: string
+    default: lts/gallium
+  secrets:
+    GITHUB_TOKEN:
+      required: true
+
+runs:
+  using: 'pnpm-install'
+  steps:
+    - name: Install Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: lts/gallium
+        registry-url: 'https://npm.pkg.github.com'
+        scope: '@emocional'
+
+    - name: fix auth
+      run: |
+        cat .npmrc >> "$HOME"/.npmrc
+        echo //npm.pkg.github.com/:_authToken="${{ secrets.GITHUB_TOKEN }}" >> "$HOME"/.npmrc
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@v2.0.1
+      id: pnpm-install
+      with:
+        version: ${{ inputs.pnpm-version }
+        run_install: false
+
+    - name: Get pnpm store directory
+      id: pnpm-cache
+      run: |
+        echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+
+    - name: Setup pnpm cache
+      uses: actions/cache@v3
+      with:
+        path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+        key: ${{ runner.os }}-node-${{ inputs.node-version }}-pnpm-${{ inputs.pnpm-version }}-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-node-${{ inputs.node-version }}-pnpm-${{ inputs.pnpm-version }}-store
