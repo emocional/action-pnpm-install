@@ -8,40 +8,40 @@ branding:
 inputs:
   pnpm-version:
     required: false
-    type: string
-    default: 8
+    description: pnpm major version
+    default: '8'
   node-version:
     required: false
-    type: string
+    description: nodejs version
     default: lts/gallium
-  secrets:
-    GITHUB_TOKEN:
-      required: true
+  token:
+    description: github token
+    default: ${{ github.token }}
 
 runs:
-  using: 'pnpm-install'
+  using: 'composite'
   steps:
     - name: Install Node.js
       uses: actions/setup-node@v3
       with:
         node-version: lts/gallium
-        registry-url: 'https://npm.pkg.github.com'
-        scope: '@emocional'
 
     - name: fix auth
+      shell: sh
       run: |
         cat .npmrc >> "$HOME"/.npmrc
-        echo //npm.pkg.github.com/:_authToken="${{ secrets.GITHUB_TOKEN }}" >> "$HOME"/.npmrc
+        echo //npm.pkg.github.com/:_authToken="${{ inputs.token }}" >> "$HOME"/.npmrc
 
     - name: Install pnpm
       uses: pnpm/action-setup@v2.0.1
       id: pnpm-install
       with:
-        version: ${{ inputs.pnpm-version }
+        version: ${{ inputs.pnpm-version }}
         run_install: false
 
     - name: Get pnpm store directory
       id: pnpm-cache
+      shell: sh
       run: |
         echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
 
