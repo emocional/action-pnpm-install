@@ -24,7 +24,7 @@ runs:
     - name: Install Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: lts/gallium
+        node-version: ${{ inputs.node_version }}
 
     - name: fix auth
       shell: sh
