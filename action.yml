@@ -14,6 +14,14 @@ inputs:
     required: false
     description: nodejs version
     default: lts/gallium
+  registry-url:
+    required: false
+    description: npm registry url
+    default: https://npm.pkg.github.com
+  scope:
+    required: false
+    description: npm scope
+    default: @emocional
   token:
     description: github token
     default: ${{ github.token }}
@@ -25,6 +33,8 @@ runs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ inputs.node_version }}
+        registry-url: ${{ inputs.registry-url }}
+        scope: ${{ inputs.scope }}
 
     - name: fix auth
       shell: sh
