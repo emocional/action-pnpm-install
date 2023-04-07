@@ -17,11 +17,11 @@ inputs:
   registry-url:
     required: false
     description: npm registry url
-    default: https://npm.pkg.github.com
+    default: 'https://npm.pkg.github.com'
   scope:
     required: false
     description: npm scope
-    default: @emocional
+    default: '@emocional'
   token:
     description: github token
     default: ${{ github.token }}
@@ -32,7 +32,7 @@ runs:
     - name: Install Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: ${{ inputs.node_version }}
+        node-version: ${{ inputs.node-version }}
         registry-url: ${{ inputs.registry-url }}
         scope: ${{ inputs.scope }}
 
