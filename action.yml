@@ -32,6 +32,8 @@ runs:
       with:
         node-version: ${{ inputs.node-version }}
         cache: pnpm
+      env:
+        GITHUB_TOKEN: ${{ inputs.token }}
 
     - name: Install pnpm dependencies
       run: pnpm install -r --frozen-lockfile --strict-peer-dependencies
