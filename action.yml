@@ -25,30 +25,15 @@ runs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ inputs.node-version }}
-
-    - name: fix auth
-      shell: sh
-      run: |
-        cat .npmrc >> "$HOME"/.npmrc
-        echo //npm.pkg.github.com/:_authToken="${{ inputs.token }}" >> "$HOME"/.npmrc
+        cache: pnpm
 
     - name: Install pnpm
       uses: pnpm/action-setup@v2.0.1
       id: pnpm-install
       with:
         version: ${{ inputs.pnpm-version }}
-        run_install: false
-
-    - name: Get pnpm store directory
-      id: pnpm-cache
-      shell: sh
-      run: |
-        echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
-
-    - name: Setup pnpm cache
-      uses: actions/cache@v3
-      with:
-        path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
-        key: ${{ runner.os }}-node-${{ inputs.node-version }}-pnpm-${{ inputs.pnpm-version }}-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-        restore-keys: |
-          ${{ runner.os }}-node-${{ inputs.node-version }}-pnpm-${{ inputs.pnpm-version }}-store
+        run_install: |
+            - recursive: true
+              args: [--frozen-lockfile, --strict-peer-dependencies]
+      env:
+        GITHUB_TOKEN: ${{ inputs.token }}
