@@ -33,7 +33,7 @@ runs:
       with:
         version: ${{ inputs.pnpm-version }}
         run_install: |
-            - recursive: true
-              args: [--frozen-lockfile, --strict-peer-dependencies]
+          - recursive: true
+            args: [--frozen-lockfile, --strict-peer-dependencies]
       env:
         GITHUB_TOKEN: ${{ inputs.token }}
