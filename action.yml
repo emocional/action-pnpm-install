@@ -21,15 +21,19 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: Install pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        run_install: false
+
     - name: Install Node.js
       uses: actions/setup-node@v3
       with:
         node-version: ${{ inputs.node-version }}
         cache: pnpm
 
-    - name: Install pnpm
-      uses: pnpm/action-setup@v2.0.1
-      id: pnpm-install
+    - name: Install pnpm dependencies
+      uses: pnpm/action-setup@v2
       with:
         version: ${{ inputs.pnpm-version }}
         run_install: |
