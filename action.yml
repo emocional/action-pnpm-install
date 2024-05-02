@@ -9,11 +9,11 @@ inputs:
   pnpm-version:
     required: false
     description: pnpm major version
-    default: '8'
+    default: '9'
   node-version:
     required: false
     description: nodejs version
-    default: lts/gallium
+    default: lts/iron
   token:
     description: github token
     default: ${{ github.token }}
