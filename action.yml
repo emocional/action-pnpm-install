@@ -13,7 +13,7 @@ inputs:
   node-version:
     required: false
     description: nodejs version
-    default: lts/iron
+    default: 'lts/iron'
   token:
     description: github token
     default: ${{ github.token }}
@@ -21,22 +21,33 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+      env:
+        GITHUB_TOKEN: ${{ inputs.token }}
+        
+    - name: Cache pnpm store
+      uses: actions/cache@v3
+      with:
+        path: ~/.pnpm-store
+        key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-
+
     - name: Install pnpm
       uses: pnpm/action-setup@v4
       with:
         version: ${{ inputs.pnpm-version }}
         run_install: false
 
-    - name: Install Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ inputs.node-version }}
-        cache: pnpm
-      env:
-        GITHUB_TOKEN: ${{ inputs.token }}
-
     - name: Install pnpm dependencies
-      run: pnpm install -r --frozen-lockfile --strict-peer-dependencies
+      run: |
+        pnpm install -r \
+          --frozen-lockfile \
+          --strict-peer-dependencies \
+          --network-concurrency=3
       shell: sh
       env:
         GITHUB_TOKEN: ${{ inputs.token }}
