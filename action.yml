@@ -9,7 +9,7 @@ inputs:
   pnpm-version:
     required: false
     description: pnpm major version
-    default: '9'
+    default: '11'
   node-version:
     required: false
     description: nodejs version
@@ -17,6 +17,10 @@ inputs:
   token:
     description: github token
     default: ${{ github.token }}
+  minimum-release-age:
+    required: false
+    description: minimum package release age in minutes
+    default: '1440'
 
 runs:
   using: 'composite'
@@ -41,6 +45,14 @@ runs:
       with:
         version: ${{ inputs.pnpm-version }}
         run_install: false
+
+    - name: Configure GitHub Packages auth
+      run: pnpm config set "//npm.pkg.github.com/:_authToken" "${{ inputs.token }}"
+      shell: sh
+
+    - name: Configure minimum release age
+      run: pnpm config set minimumReleaseAge "${{ inputs.minimum-release-age }}"
+      shell: sh
 
     - name: Install pnpm dependencies
       run: |
