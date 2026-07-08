@@ -13,7 +13,7 @@ inputs:
   node-version:
     required: false
     description: nodejs version
-    default: 'lts/iron'
+    default: 'lts/jod'
   token:
     description: github token
     default: ${{ github.token }}
