@@ -21,6 +21,10 @@ inputs:
     required: false
     description: minimum package release age in minutes
     default: '1440'
+  cache-dependency-path:
+    required: false
+    description: lockfile path(s) for pnpm store cache key (newline-separated)
+    default: pnpm-lock.yaml
 
 runs:
   using: 'composite'
@@ -31,20 +35,14 @@ runs:
         node-version: ${{ inputs.node-version }}
       env:
         GITHUB_TOKEN: ${{ inputs.token }}
-        
-    - name: Cache pnpm store
-      uses: actions/cache@v5
-      with:
-        path: ~/.pnpm-store
-        key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
-        restore-keys: |
-          ${{ runner.os }}-pnpm-
 
     - name: Install pnpm
       uses: pnpm/action-setup@v6
       with:
         version: ${{ inputs.pnpm-version }}
         run_install: false
+        cache: true
+        cache_dependency_path: ${{ inputs.cache-dependency-path }}
 
     - name: Configure GitHub Packages auth
       run: pnpm config set "//npm.pkg.github.com/:_authToken" "${{ inputs.token }}"
