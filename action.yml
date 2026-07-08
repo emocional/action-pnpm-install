@@ -25,6 +25,22 @@ inputs:
     required: false
     description: lockfile path(s) for pnpm store cache key (newline-separated)
     default: pnpm-lock.yaml
+  working-directory:
+    required: false
+    description: directory to run pnpm install from (composite actions always start at repo root)
+    default: .
+  recursive:
+    required: false
+    description: pass -r to pnpm install (monorepo / workspace root)
+    default: 'true'
+  strict-peer-dependencies:
+    required: false
+    description: pass --strict-peer-dependencies to pnpm install
+    default: 'true'
+  skip-install:
+    required: false
+    description: only set up node, pnpm, auth and cache; do not run pnpm install
+    default: 'false'
 
 runs:
   using: 'composite'
@@ -53,11 +69,15 @@ runs:
       shell: sh
 
     - name: Install pnpm dependencies
+      if: inputs.skip-install != 'true'
       run: |
-        pnpm install -r \
-          --frozen-lockfile \
-          --strict-peer-dependencies \
-          --network-concurrency=3
+        install_args="--frozen-lockfile --network-concurrency=3"
+        if [ "${{ inputs.strict-peer-dependencies }}" = "true" ]; then
+          install_args="$install_args --strict-peer-dependencies"
+        fi
+        if [ "${{ inputs.recursive }}" = "true" ]; then
+          install_args="$install_args -r"
+        fi
+        cd "${{ inputs.working-directory }}"
+        pnpm install $install_args
       shell: sh
-      env:
-        GITHUB_TOKEN: ${{ inputs.token }}
